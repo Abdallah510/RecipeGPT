@@ -108,3 +108,82 @@ input.form-control:focus {
     border-color: #34d399;
     box-shadow: 0 0 0 0.2rem rgba(52, 211, 153, 0.3);
 }
+
+
+.autocomplete {
+    position: relative;
+    display: inline-block;
+    width: 300px;
+    position: absolute;
+    transform: translate(-50%);
+    left: 50%;
+    top: 20px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #F2F0EF;
+}
+
+.autocomplete-items {
+    position: absolute;
+    background-color: #30a6ff;
+    border-bottom: none;
+    max-height: 200px;
+    z-index: 9999;
+    overflow-y: auto;
+    top: 100%;
+    left: 0;
+    right: 0;
+}
+
+.autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #F2F0EF;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+.autocomplete-items div:hover {
+    background-color: #e9e9e9;
+}
+
+.autocomplete-active {
+    background-color: #000000 !important;
+    color: #F2F0EF;
+}
+
+.message {
+  padding: 0.6rem 1rem;
+  margin: 0.3rem 0;
+  border-radius: 6px;
+  max-width: 80%;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.user {
+  align-self: flex-end;     
+  background-color: #0a84ff;
+  color: white;
+}
+
+.ai {
+  align-self: flex-start;   
+  background-color: #3a3a3a;
+  color: #f5f5f5;
+}
+#aiResults {
+    display: flex;
+    flex-direction: column;   /* stack messages vertically */
+    gap: 0.5rem;              /* space between messages */
+    max-height: 400px;        /* maximum height for the container */
+    overflow-y: auto;         /* scroll if content exceeds height */
+    padding: 1rem;            /* optional padding inside container */
+    background-color: #f5f5f5; /* optional background */
+    border-radius: 8px;        /* optional rounded corners */
+}
