@@ -207,6 +207,8 @@ async function sendMessage(chatBox, chatContainer) {
         alert("Run diagnostics first");
         return;
     }
+    let outputbox = document.getElementById("outputBox");
+    outputbox.hidden = false;
 
     const text = chatBox.value.trim();
     if (!text) return;
@@ -219,11 +221,48 @@ async function sendMessage(chatBox, chatContainer) {
     chatBox.value = "";
 
     try {
-        let response = await session.prompt(text);
-        const aiMsg = document.createElement("div");
-        aiMsg.className = "message ai";
-        aiMsg.innerHTML = renderMarkdown(response);
-        chatContainer.appendChild(aiMsg);
+                const prompt = `User Ingredients: ${text}
+                Instruction: Generate a recipe including:
+                1. "country": The name of the country.
+                2. "name": The recipe title.
+                3. "description": A short 1–2 sentence description of the dish.
+                4. "ingredients": An array of ingredient strings.
+                5. "instructions": An array of 4–7 full-sentence cooking steps (each step should be detailed, not one word).
+                6. "time": Estimated cooking time (e.g., "30 minutes").
+                7. "image_description": A short phrase describing what the dish looks like.
+
+                Important:
+                - Return ONLY valid 3 JSON recipes.
+                - Use double quotes (") for all keys and strings.
+                - Return an array of recipe objects (e.g. [ { ... }, { ... } ]).
+                - Do NOT include any commentary, Markdown, or text outside of the JSON.`;
+
+
+
+
+        
+
+        const fullPrompt = `User Ingredients: ${text}\n${prompt}`;
+        let response = await session.prompt(fullPrompt);
+
+
+        let cleanResponse = response.replace(/```json\s*|```/g, "").trim();
+
+        let recipe;
+        try {
+            recipe = JSON.parse(cleanResponse);
+        } catch (err) {
+            console.error("Failed to parse JSON:", err, cleanResponse);
+            chatContainer.innerHTML += `<div class="message ai">❌ Invalid AI response</div>`;
+            return;
+        }
+        renderRecipeCards(recipe, chatContainer);
+
+
+        // const aiMsg = document.createElement("div");
+        // aiMsg.className = "message ai";
+        // aiMsg.innerHTML = renderMarkdown(response);
+        // chatContainer.appendChild(aiMsg);
         
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -234,6 +273,98 @@ async function sendMessage(chatBox, chatContainer) {
         chatContainer.appendChild(aiMsg);
     }
 }
+
+function renderRecipeCards(recipes, container) {
+  const row = document.createElement("div");
+  row.className = "row g-4 mt-2";
+
+  recipes.forEach((recipe, index) => {
+    const shortIngredients = recipe.ingredients.slice(0, 3).join(", ") + (recipe.ingredients.length > 3 ? "..." : "");
+
+    const card = document.createElement("div");
+    card.className = "col-md-4";
+
+    card.innerHTML = `
+      <div class="card h-100 shadow-sm border-0 recipe-card" 
+           style="cursor:pointer; transition:transform 0.2s ease;"
+           data-index="${index}">
+        <img src="/images/background.jpg" class="card-img-top" alt="${recipe.name}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title mb-0">${recipe.name}</h5>
+            <span class="badge bg-light text-dark border">${recipe.country}</span>
+          </div>
+          <p class="text-muted small mb-1">⏱ ${recipe.time}</p>
+          <p class="card-text"><strong>Ingredients:</strong> ${shortIngredients}</p>
+        </div>
+      </div>
+    `;
+
+    card.querySelector(".recipe-card").addEventListener("click", () => showRecipeModal(recipe));
+    row.appendChild(card);
+  });
+
+  container.appendChild(row);
+
+  // Make sure modal exists only once
+  if (!document.getElementById("recipeModal")) {
+    const modalHTML = `
+      <div class="modal fade" id="recipeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="recipeTitle"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <img id="recipeImage" src="" alt="" class="img-fluid rounded mb-3">
+              <p id="recipeCountry" class="text-muted"></p>
+              <p id="recipeTime" class="text-muted"></p>
+              <p id="recipeDescription" class="mb-3"></p>
+              <h6 class="text-info">Ingredients:</h6>
+              <ul id="recipeIngredients"></ul>
+              <h6 class="text-warning mt-3">Instructions:</h6>
+              <ol id="recipeInstructions"></ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+  }
+}
+function showRecipeModal(recipe) {
+  document.getElementById("recipeTitle").textContent = recipe.name;
+  document.getElementById("recipeImage").src = "/images/background.jpg";
+  document.getElementById("recipeCountry").textContent = `🌍 Country: ${recipe.country}`;
+  document.getElementById("recipeTime").textContent = `⏱ Time: ${recipe.time}`;
+  document.getElementById("recipeDescription").textContent = recipe.description;
+  
+  document.getElementById("recipeIngredients").innerHTML =
+    recipe.ingredients.map(i => `<li>${i}</li>`).join("");
+  document.getElementById("recipeInstructions").innerHTML =
+    recipe.instructions.map(s => `<li>${s}</li>`).join("");
+
+  const modal = new bootstrap.Modal(document.getElementById("recipeModal"));
+  modal.show();
+}
+
+// function renderRecipeCard(recipe, container) {
+//     const card = document.createElement("div");
+//     card.className = "card card-modern p-4 text-center mb-3"; // styling + spacing
+
+//     card.innerHTML = `
+//         <h5 class="fw-bold">${recipe.name}</h5>
+//         <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
+//         <p><strong>Instructions:</strong><br>${recipe.instructions.join("<br>")}</p>
+//         <p><strong>Estimated Time:</strong> ${recipe.time}</p>
+//         <p>${recipe.image_description || ""}</p>
+//     `;
+
+//     container.appendChild(card);
+//     container.scrollTop = container.scrollHeight; // auto-scroll if chat-style
+// }
+
 // async function sendMessage(chatBox, chatContainer) {
 //     if (!session) {
 //         alert("Run diagnostics first");
