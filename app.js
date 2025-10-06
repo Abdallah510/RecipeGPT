@@ -11,5 +11,6 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => res.render("home"));
+app.get("/recommendations", (req, res) => res.render("recommendations"));
 
 app.listen(3000, () => console.log("Server running at http://localhost:3000"));
