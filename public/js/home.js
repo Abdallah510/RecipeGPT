@@ -3,8 +3,7 @@ let session = null;
 let foods_list = [];       // Stores foods for autocomplete
 let chatContainer = null;  // Will hold AI chat messages
 let autocompleteList = null; // Floating list container
-
-selectedItems = []
+let selectedItems = []
 
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("chat");
@@ -34,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("input", () => {
         // let n = 0;
         const fullQuery = input.value.toLowerCase().split(",");
-        query =  fullQuery[fullQuery.length - 1].trim();
+        query = fullQuery[fullQuery.length - 1].trim();
         autocompleteList.innerHTML = "";
         currentFocus = -1;
         if (!query) return;
@@ -70,13 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-function addToken(text) {
-    const input = document.getElementById("chat");
-    const tokens = input.value.split(",").map(t => t.trim()).filter(t => t);
-    tokens[tokens.length - 1] = text; // replace last token
-    input.value = tokens.join(", ") + ", "; // add comma for next entry
-    autocompleteList.innerHTML = "";      // clear suggestions
-}
+    function addToken(text) {
+        const input = document.getElementById("chat");
+        const tokens = input.value.split(",").map(t => t.trim()).filter(t => t);
+        tokens[tokens.length - 1] = text; // replace last token
+        input.value = tokens.join(", ") + ", "; // add comma for next entry
+        autocompleteList.innerHTML = "";      // clear suggestions
+    }
 
 
     function highlightItem(items) {
@@ -224,7 +223,7 @@ async function sendMessage(chatBox, chatContainer) {
         aiMsg.className = "message ai";
         aiMsg.innerHTML = renderMarkdown(response);
         chatContainer.appendChild(aiMsg);
-        
+
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
     } catch (err) {
