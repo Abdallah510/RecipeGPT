@@ -8,21 +8,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("recommendBtn");
   const container = document.getElementById("recipesContainer");
 
-  btn.addEventListener("click", async () => {
-    // Add a small loading message above new recipes
+  btn.addEventListener("click", async (e) => {
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    btn.disabled = true;
+    const initialMsg = document.querySelector(".initial-message");
+    if (initialMsg) initialMsg.remove();
+
     const loading = document.createElement("p");
-    loading.className = "text-center text-secondary mt-3";
+    loading.className = "text-center text-secondary mt-3 text-white";
     loading.textContent = "Generating more world recipes... 🌎🍳";
     container.appendChild(loading);
-
-    // Ensure session exists
-    if (!session) {
-      const ok = await runDiagnostics();
-      if (!ok) return;
+    try {
+      // Ensure session exists
+      if (!session) {
+        const ok = await runDiagnostics();
+        if (!ok) return;
+      }
+      await generateWorldRecipes(container, loading);
+    } catch (err) {
+      console.error("Error during recipe generation:", err);
+      loading.remove();
+      container.innerHTML += `<p class="text-danger">❌ Error: Failed to Generate Recipes</p>`;
+    } finally {
+      btn.disabled = false;
     }
-
-    // Generate new batch of recipes and append
-    await generateWorldRecipes(container, loading);
   });
 });
 
@@ -49,25 +61,25 @@ async function runDiagnostics() {
 // Generate World Recipes (Append Mode)
 // ---------------------------
 async function generateWorldRecipes(container, loadingElement) {
+  const country = document.getElementById("countrySelect").value;
+  const language = document.getElementById("languageSelect").value;
   const promptText = `
-Generate 3 unique recipes from different countries around the world.
+Generate 3 unique recipes from ${country}.
 
 Each recipe must be a JSON object with the following fields:
-1. "country": The name of the country.
-2. "name": The recipe title.
-3. "description": A short 1–2 sentence description of the dish.
-4. "ingredients": An array of ingredient strings.
-5. "instructions": An array of 4–7 full-sentence cooking steps (each step should be detailed, not one word).
-6. "time": Estimated cooking time (e.g., "30 minutes").
-7. "image_description": A short phrase describing what the dish looks like.
-ultra important(this is a very important point):if this is the second or third.... time i give you this prompt please do not say anything else but the json array of recipes.
+1. "country": The name of the country in ${language}.
+2. "name": The recipe title in English.
+3. "description": A short 1–2 sentence description of the dish in ${language}.
+4. "ingredients": An array of ingredient strings in ${language}.
+5. "instructions": An array of 4–7 full-sentence cooking steps (each step should be detailed, not one word) in ${language}.
+6. "time": Estimated cooking time (e.g., "30 minutes")in ${language}.
 Important:
 - Return ONLY valid JSON.
 - Use double quotes (") for all keys and strings.
 - Return an array of recipe objects (e.g. [ { ... }, { ... } ]).
 - Do NOT include any commentary, Markdown, or text outside of the JSON.
 - Do NOT include any whitespace or indentation.
-- if you use " " double quotes inside a string, escape them with a backslash (\") like this \"cooked\".
+- DO NOT INCLUDE ANY DOUBLE QUOTES IN THE STRING IN THE OUTPUT JSON.
 `;
 
   try {
@@ -106,15 +118,15 @@ function renderRecipeCards(recipes, container) {
     const width = 1024;
     const height = 1024;
     const seed = 42;
-    const model = 'flux'; 
-    try{
+    const model = 'flux';
+    try {
       imageUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&model=${model}`;
       photos[recipe.name] = imageUrl;
-    }catch(err){
+    } catch (err) {
       console.error("Image generation error:", err);
       photos[recipe.name] = "/images/background.jpg";
     }
-   
+
 
     const card = document.createElement("div");
     card.className = "col-md-4";
@@ -161,6 +173,9 @@ function renderRecipeCards(recipes, container) {
               <h6 class="text-warning mt-3">Instructions:</h6>
               <ol id="recipeInstructions"></ol>
             </div>
+            <div class="modal-footer">
+              <button id="downloadRecipeBtn" class="btn btn-success">⬇️ Download Recipe</button>
+            </div>
           </div>
         </div>
       </div>
@@ -185,68 +200,37 @@ function showRecipeModal(recipe) {
   document.getElementById("recipeCountry").textContent = `🌍 Country: ${recipe.country}`;
   document.getElementById("recipeTime").textContent = `⏱ Time: ${recipe.time}`;
   document.getElementById("recipeDescription").textContent = recipe.description;
-  
+
   document.getElementById("recipeIngredients").innerHTML =
     recipe.ingredients.map(i => `<li>${i}</li>`).join("");
   document.getElementById("recipeInstructions").innerHTML =
     recipe.instructions.map(s => `<li>${s}</li>`).join("");
 
   const modal = new bootstrap.Modal(document.getElementById("recipeModal"));
+  document.getElementById("downloadRecipeBtn").onclick = () => downloadRecipe(recipe);
   modal.show();
 }
-
-
-// Improved Markdown renderer for proper lists
-function renderMarkdown(text) {
-    if (!text) return "";
-
-    // Escape HTML to avoid XSS
-    text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-    // --- Code Blocks ```lang ... ```
-    text = text.replace(/```(.*?)\n([\s\S]*?)```/g, (match, lang, code) => {
-        return `<pre><code class="${lang}">${code}</code></pre>`;
-    });
-
-    // Inline code `code`
-    text = text.replace(/`([^`\n]+)`/g, "<code>$1</code>");
-
-    // Bold and italics ***text***
-    text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, "<strong><em>$1</em></strong>");
-    // Bold **text**
-    text = text.replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>");
-    // Italic *text*
-    text = text.replace(/\*([^\*]+)\*/g, "<em>$1</em>");
-
-    // Underline __text__
-    text = text.replace(/__([^_]+)__/g, "<u>$1</u>");
-
-    // Strikethrough ~~text~~
-    text = text.replace(/~~([^~]+)~~/g, "<s>$1</s>");
-
-    // Headings # H1, ## H2, ### H3
-    text = text.replace(/^### (.*)$/gm, "<h3>$1</h3>");
-    text = text.replace(/^## (.*)$/gm, "<h2>$1</h2>");
-    text = text.replace(/^# (.*)$/gm, "<h1>$1</h1>");
-
-    // Blockquote > text
-    text = text.replace(/^> (.*)$/gm, "<blockquote>$1</blockquote>");
-
-    // Unordered lists (- or *)
-    text = text.replace(/^(?:-|\*) (.*)$/gm, "<li>$1</li>");
-    // Wrap <li> in <ul>
-    text = text.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>");
-
-    // Ordered lists 1. 2. 3.
-    text = text.replace(/^\d+\. (.*)$/gm, "<li>$1</li>");
-    // Wrap <li> in <ol>
-    text = text.replace(/(<li>[\s\S]*?<\/li>)/g, "<ol>$1</ol>");
-
-    // Links [text](url)
-    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-    // Line breaks
-    text = text.replace(/\n/g, "<br>");
-
-    return text;
+// ---------------------------
+// Download Recipe Function
+// ---------------------------
+function downloadRecipe(recipe) {
+  const recipeText = `
+${recipe.name}
+====================
+Country: ${recipe.country}
+Time: ${recipe.time}
+Description:
+${recipe.description}
+Ingredients:
+${recipe.ingredients.map(i => `- ${i}`).join("\n")}
+Instructions:
+${recipe.instructions.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
+  `;
+  const blob = new Blob([recipeText], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${recipe.name.replace(/\s+/g, "_")}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
 }

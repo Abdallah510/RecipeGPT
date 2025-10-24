@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include ("partials/meal-planner-header.ejs") %>
+
+  <body class="has-hero bg-dark text-light">
+    <!-- Navbar -->
+    <%- include ("partials/nav.ejs") %>
+    <!-- Hero -->
+    <header class="hero d-flex align-items-center justify-content-center text-center">
+      <video class="hero-video" autoplay muted loop playsinline poster="/images/background.jpg">
+        <source src="/videos/vid.mp4" type="video/mp4" />
+      </video>
+      <div class="hero-overlay"></div>
+
+      <div class="container position-relative hero-content">
+        <h1 class="display-4 fw-bold text-hero reveal">
+          Eat smarter. <span class="accent">Plan faster.</span>
+        </h1>
+        <p class="lead text-hero-subtle mb-4 reveal">
+          Tell us your goals and let AI create a delicious meal plan in seconds.
+        </p>
+        <a href="#planner" class="btn btn-neo btn-lg reveal text-white">
+          <i class="bi bi-lightning-charge-fill me-1">Start Planning</i> 
+        </a>
+      </div>
+
+      <div class="hero-divider"></div>
+    </header>
+    <!-- Planner Section -->
+    <main id="planner" class="py-5">
+      <div class="container">
+        <div class="card glass mx-auto p-4 reveal" style="max-width: 950px;">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge badge-soft">New</span>
+            <small class="text-white">Animated UI + Video + Glassmorphism</small>
+          </div>
+
+          <h2 class="fw-bold mb-2 accent text-center">Plan Your Perfect Meals</h2>
+          <p class="text-white text-center mb-4 ">
+            Choose your preferences, add notes, and let AI craft a balanced plan for you!
+          </p>
+
+          <form id="mealForm">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="days" class="form-label fw-semibold text-white">Number of Days</label>
+                <select class="form-select" id="days" required>
+                  <option value="" selected disabled>Select Days</option>
+                  <option value="3">3 Days</option>
+                  <option value="5">5 Days</option>
+                  <option value="7">7 Days</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label for="diet" class="form-label fw-semibold text-white">Diet Type</label>
+                <select class="form-select" id="diet" required>
+                  <option value="" selected disabled>Select Diet</option>
+                  <option value="balanced">Balanced</option>
+                  <option value="vegetarian">Vegetarian</option>
+                  <option value="vegan">Vegan</option>
+                  <option value="keto">Keto</option>
+                  <option value="mediterranean">Mediterranean</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label for="calories" class="form-label fw-semibold text-white">Calories per Day</label>
+                <input type="number" class="form-control" id="calories" placeholder="e.g. 2000" required />
+              </div>
+
+              <div class="col-md-6">
+                <label for="Purpose" class="form-label fw-semibold text-white">Purpose</label>
+                <select class="form-select" id="Purpose">
+                  <option value="any">Any</option>
+                  <option value="weightLoss">Weight Loss</option>
+                  <option value="muscleGain">Muscle Gain</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="healthyEating">Healthy Eating</option>
+                  <option value="highProtein">High Protein</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label for="notes" class="form-label fw-semibold text-white">Notes or Allergies</label>
+                <textarea class="form-control" id="notes" rows="3" placeholder="No dairy, gluten-free, etc."></textarea>
+              </div>
+
+              <div class="col-12 text-center mt-3">
+                <button type="submit" id="generateBtn" class="btn btn-neo px-5 py-2 fw-semibold text-white">
+                  <i class="bi bi-magic me-1">Generate Meal Plan</i> 
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div id="mealResults" class="card glass-soft mt-5 p-4 reveal text-center">
+          <p class="initial-message text-white mb-0">
+            No meal plan yet. Fill out the form above to generate one!
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!-- How it Works -->
+    <section id="how" class="py-5 bg-dark bg-gradient">
+      <div class="container text-center text-light">
+        <h3 class="fw-bold mb-4 text-success">How It Works</h3>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card glass-soft p-4 h-100">
+              <h5 class="text-white">Set Your Preferences</h5>
+              <p class="text-white">Pick days, diet, and calorie goals.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card glass-soft p-4 h-100">
+              <h5 class="text-white">AI Crafts Your Plan</h5>
+              <p class="text-white">Smart, delicious ideas for every meal.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card glass-soft p-4 h-100">
+              <h5 class="text-white">Cook & Enjoy</h5>
+              <p class="text-white">Use the plan or adjust to your taste!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="py-3 bg-dark text-center text-white-50 small border-top border-success border-opacity-25">
+      Content is AI-generated and may contain inaccuracies. Use your best judgement when making AI recipes.
+    </footer>
+
+    <%- include ("partials/chat-bot.ejs") %>
+
+  </body>
+</html>

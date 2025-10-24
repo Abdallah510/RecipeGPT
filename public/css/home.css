@@ -8,6 +8,7 @@ body {
     color: #111827;
     font-family: 'Roboto', sans-serif;
 }
+
 /* Navbar */
 .navbar {
     background-color: #10b981;
@@ -43,7 +44,7 @@ header h1 {
 }
 
 /* Buttons */
-.btn-primary {
+.btn-success {
     background-color: #10b981;
     border: none;
     color: #ffffff;
@@ -53,13 +54,13 @@ header h1 {
     transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
+.btn-success:hover {
     background-color: #34d399;
     color: #ffffff;
     transform: translateY(-2px);
 }
 
-.btn-outline-primary {
+.btn-outline-success {
     border: 2px solid #10b981;
     color: #10b981;
     border-radius: 999px;
@@ -67,7 +68,7 @@ header h1 {
     transition: all 0.3s ease;
 }
 
-.btn-outline-primary:hover {
+.btn-outline-success:hover {
     background-color: #10b981;
     border-color: #34d399;
     color: #ffffff;
@@ -161,32 +162,40 @@ input[type="text"] {
 }
 
 .message {
-  padding: 0.6rem 1rem;
-  margin: 0.3rem 0;
-  border-radius: 6px;
-  max-width: 80%;
-  line-height: 1.4;
-  white-space: pre-wrap;
+    padding: 0.6rem 1rem;
+    margin: 0.3rem 0;
+    border-radius: 6px;
+    max-width: 80%;
+    line-height: 1.4;
+    white-space: pre-wrap;
 }
 
 .user {
-  align-self: flex-end;     
-  background-color: #0a84ff;
-  color: white;
+    align-self: flex-end;
+    background-color: #0a84ff;
+    color: white;
 }
 
 .ai {
-  align-self: flex-start;   
-  background-color: #3a3a3a;
-  color: #f5f5f5;
+    align-self: flex-start;
+    background-color: #3a3a3a;
+    color: #f5f5f5;
 }
+
 #aiResults {
     display: flex;
-    flex-direction: column;   /* stack messages vertically */
-    gap: 0.5rem;              /* space between messages */
-    max-height: 400px;        /* maximum height for the container */
-    overflow-y: auto;         /* scroll if content exceeds height */
-    padding: 1rem;            /* optional padding inside container */
-    background-color: #f5f5f5; /* optional background */
-    border-radius: 8px;        /* optional rounded corners */
+    flex-direction: column;
+    /* stack messages vertically */
+    gap: 0.5rem;
+    /* space between messages */
+    max-height: 400px;
+    /* maximum height for the container */
+    overflow-y: auto;
+    /* scroll if content exceeds height */
+    padding: 1rem;
+    /* optional padding inside container */
+    background-color: #f5f5f5;
+    /* optional background */
+    border-radius: 8px;
+    /* optional rounded corners */
 }
