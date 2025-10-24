@@ -1,0 +1,316 @@
+<!-- Floating Chatbot Toggle -->
+<div id="chatbot-toggle" class="chatbot-toggle d-flex justify-content-center align-items-center rounded-circle"
+  title="Chat with our AI Chef!">
+  🍽️
+</div>
+<!-- Chatbot Window -->
+<div id="chatbot-box"
+  class="chatbot-box bg-dark bg-opacity-90 text-light rounded-4 overflow-hidden d-flex flex-column d-none">
+
+  <!-- Header -->
+  <div id="chatbot-close" class="d-flex justify-content-between align-items-center px-3 py-2 text-white">
+    <span>🍳 Recipe Chatbot</span>
+    <button id="chatbot-close" class="btn btn-sm text-white fs-5 border-0 bg-transparent">&times;</button>
+  </div>
+
+  <!-- Messages -->
+  <div id="chatbot-messages" class="flex-grow-1 p-3 d-flex flex-column gap-2 overflow-auto"></div>
+
+  <!-- Input Area -->
+  <div id="chatbot-input-area" class="d-flex border-top border-secondary bg-dark bg-opacity-75 p-2">
+    <input id="chatbot-input" type="text" class="form-control bg-secondary bg-opacity-25 text-white border-0 rounded-3"
+      placeholder="Ask me about recipes...">
+    <button id="chatbot-send" class="btn ms-2 px-3">➤</button>
+  </div>
+</div>
+
+<style>
+  .chatbot-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    color: white;
+    background: #28e076;
+    cursor: pointer;
+    z-index: 9999;
+    transition: transform 0.3s;
+  }
+
+  .chatbot-toggle:hover {
+    transform: scale(1.1);
+  }
+
+  /* Chat Window */
+  .chatbot-box {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 550px;
+    height: 400px;
+    z-index: 9999;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  .chatbot-box.closing {
+    animation: slideOut 0.3s ease-in forwards;
+  }
+
+  #chatbot-close {
+    background: #2ecc71;
+  }
+
+  /* Messages */
+  .bot-message,
+  .user-message {
+    padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 80%;
+    word-wrap: break-word;
+  }
+
+  .bot-message {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f4f4f4;
+    align-self: flex-start;
+  }
+
+  .user-message {
+    background: linear-gradient(135deg, #ff7b00, #ff3c00);
+    color: white;
+    align-self: flex-end;
+  }
+
+  #chatbot-send {
+    background: #2ecc71;
+    color: white;
+    transition: transform 0.3s;
+  }
+
+  #chatbot-send:hover {
+    transform: scale(1.1);
+  }
+
+  #chatbot-input::placeholder {
+    color: #fff;
+  }
+
+  /* Animations */
+  @keyframes slideIn {
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    to {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    let session = null;
+    // ---------------------------
+    // Chatbot Elements
+    // ---------------------------
+    const toggle = document.getElementById("chatbot-toggle");
+    const chatbot = document.getElementById("chatbot-box");
+    const closeBtn = chatbot.querySelector("#chatbot-close");
+    const messages = document.getElementById("chatbot-messages");
+    const input = document.getElementById("chatbot-input");
+    const sendBtn = document.getElementById("chatbot-send");
+
+    // ---------------------------
+    // Chatbot UI Animation
+    // ---------------------------
+    function openChatbot() {
+      chatbot.classList.remove("d-none");
+      chatbot.style.animation = "slideIn 0.3s ease-out";
+    }
+
+    function closeChatbot() {
+      chatbot.classList.add("closing");
+      chatbot.style.animation = "slideOut 0.3s ease-in";
+      chatbot.addEventListener(
+        "animationend",
+        () => {
+          chatbot.classList.add("d-none");
+          chatbot.classList.remove("closing");
+        },
+        { once: true }
+      );
+    }
+
+    toggle.addEventListener("click", () => {
+      chatbot.classList.contains("d-none") ? openChatbot() : closeChatbot();
+    });
+
+    closeBtn.addEventListener("click", closeChatbot);
+
+    // ---------------------------
+    // AI Session Setup
+    // ---------------------------
+    async function runDiagnostics() {
+      if (!window.LanguageModel) {
+        alert("LanguageModel API not available");
+        return false;
+      }
+      try {
+        session = await LanguageModel.create();
+        console.log("✅ AI session ready");
+        return true;
+      } catch (err) {
+        console.error(err);
+        alert("Failed to start AI session");
+        return false;
+      }
+    }
+
+    // ---------------------------
+    // Message Helpers
+    // ---------------------------
+    function appendMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.classList.add(sender === "bot" ? "bot-message" : "user-message");
+
+      if (sender === "bot") {
+        msg.innerHTML = renderMarkdown(text);
+        sendBtn.disabled = false;
+      } else {
+        msg.textContent = text;
+      }
+      messages.appendChild(msg);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    // ---------------------------
+    // Handle Send Message
+    // ---------------------------
+    async function sendMessage() {
+
+      const userText = input.value.trim();
+      if (!userText) return;
+      appendMessage(userText, "user");
+      input.value = "";
+
+      // Show typing indicator
+      const thinking = document.createElement("div");
+      thinking.className = "bot-message";
+      thinking.textContent = "🤖 Thinking...";
+      messages.appendChild(thinking);
+      messages.scrollTop = messages.scrollHeight;
+
+      try {
+        if (!session) {
+          const ok = await runDiagnostics();
+          if (!ok) return;
+        }
+
+        // Ask AI using the Prompt API
+        const reply = await session.prompt(`
+      You are an expert chef assistant.
+      important: anything that is not food related or if you dont understande somthing anser with:
+      "If you need assistance with anything related to food, recipes,or meal planning, please let me know! I'm here to help with culinary topics."
+      dont send this message if the item if food related
+      also dont apend this message to anything if somting is not food related gust answer with this message nothing else.
+      Here is the user input: ${userText}`);
+        thinking.remove();
+        appendMessage(reply.trim(), "bot");
+      } catch (err) {
+        console.error("AI error:", err);
+        thinking.remove();
+        appendMessage("❌ Sorry, something went wrong.", "bot");
+      }
+    }
+
+    // Enable/disable send button dynamically
+    input.addEventListener("input", () => {
+      sendBtn.disabled = input.value.trim().length === 0;
+    });
+
+    // Send message when button clicked
+    sendBtn.addEventListener("click", () => {
+      if (!input.value.trim()) return;
+      sendMessage();
+    });
+
+    // Send message when Enter pressed
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && input.value.trim()) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  });
+
+
+
+
+  function renderMarkdown(text) {
+    if (!text) return "";
+
+    // Escape HTML to avoid XSS
+    text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // --- Code Blocks ```lang ... ```
+    text = text.replace(/```(.*?)\n([\s\S]*?)```/g, (match, lang, code) => {
+      return `<pre><code class="${lang}">${code}</code></pre>`;
+    });
+
+    // Inline code `code`
+    text = text.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+
+    // Bold and italics ***text***
+    text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, "<strong><em>$1</em></strong>");
+    // Bold **text**
+    text = text.replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>");
+    // Italic *text*
+    text = text.replace(/\*([^\*]+)\*/g, "<em>$1</em>");
+
+    // Underline __text__
+    text = text.replace(/__([^_]+)__/g, "<u>$1</u>");
+
+    // Strikethrough ~~text~~
+    text = text.replace(/~~([^~]+)~~/g, "<s>$1</s>");
+
+    // Headings # H1, ## H2, ### H3
+    text = text.replace(/^### (.*)$/gm, "<h3>$1</h3>");
+    text = text.replace(/^## (.*)$/gm, "<h2>$1</h2>");
+    text = text.replace(/^# (.*)$/gm, "<h1>$1</h1>");
+
+    // Blockquote > text
+    text = text.replace(/^> (.*)$/gm, "<blockquote>$1</blockquote>");
+
+    // Unordered lists (- or *)
+    text = text.replace(/^(?:-|\*) (.*)$/gm, "<li>$1</li>");
+    text = text.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>");
+
+    // Ordered lists 1. 2. 3.
+    text = text.replace(/^\d+\. (.*)$/gm, "<li>$1</li>");
+    text = text.replace(/(<li>[\s\S]*?<\/li>)/g, "<ol>$1</ol>");
+
+    // Links [text](url)
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+    // Line breaks (only inside paragraphs)
+    text = text.replace(/([^\n])\n([^\n])/g, "$1<br>$2");
+
+    return text;
+  }
+</script>
