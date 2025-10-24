@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include("partials/home-header.ejs") %>
+  <%- include("partials/home-header.ejs") %>
   <body>
     <!-- Navbar -->
-   <%- include("partials/nav.ejs") %>
+    <%- include("partials/nav.ejs") %>
     <!-- Hero Section -->
     <header class="text-center py-5">
       <div class="container">
@@ -33,29 +33,116 @@
                 Type your ingredients below or upload a photo for AI suggestions
               </p>
             </div>
-            <form class="mb-3">
-              <input
-                id="chat"
-                type="text"
-                class="form-control mb-3"
-                placeholder="e.g., tomato, cheese, basil"
-                required
-              />
-              <button id="ask" type="submit" class="btn btn-primary">
-                Get Recommendations
-              </button>
+            <form class="mb-3" id="advancedForm" hidden>
+              <div>
+                <label for="cuisine-select">Select Cuisine:</label>
+                <select id="cuisine-select" name="cuisine" size="5">
+                  <option value="italian">Italian</option>
+                  <option value="mexican">Mexican</option>
+                  <option value="asian">Asian</option>
+                  <option value="indian">Indian</option>
+                  <option value="mediterranean">Mediterranean</option>
+                  <option value="french">French</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="dish-type-select">Select Dish Type:</label> <br />
+                <select
+                  id="dish-type-select"
+                  name="dish-type"
+                  size="4"
+                  multiple
+                >
+                  <option value="appetizer">Appetizer</option>
+                  <option value="main-dish">Main Dish</option>
+                  <option value="side-dish">Side Dish</option>
+                  <option value="dessert">Dessert</option>
+                  <option value="beverage">Beverage</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="diet-type-select">Select Diet Type:</label> <br />
+                <select
+                  id="diet-type-select"
+                  name="diet-type"
+                  size="4"
+                  multiple
+                >
+                  <option value="Vegetarian">Vegetarian</option>
+                  <option value="Vegan">Vegan</option>
+                  <option value="Any (Default)">Any (Default)</option>
+                </select>
+              </div>
+
+              <br />
             </form>
-            <form enctype="multipart/form-data">
-              <input
-                type="file"
-                class="form-control mb-3"
-                id="imageInput"
-                accept="image/*"
-              />
-              <button type="submit" class="btn btn-outline-primary">
-                Upload Photo
-              </button>
+            <form class="mb-3" id="form">
+              <div class="input-bar mb-2">
+                <input
+                  type="checkbox"
+                  id="advancedFilter"
+                  name="choices"
+                  value="value1"
+                />
+                <label for="advancedFilter">Advanced Filters</label>
+              </div>
+              <div class="input-bar mb-2">
+                <input
+                  type="checkbox"
+                  id="includeOnlyAvailable"
+                  name="choices"
+                  value="value2"
+                />
+                <label for="includeOnlyAvailable"
+                  >include Only Given Ingredients</label
+                >
+              </div>
+
+              <div class="input-bar mb-3">
+                <div class="file-upload-container">
+                  <button
+                    id="plusBtn"
+                    type="button"
+                    class="plus-btn"
+                    title="Add options"
+                  >
+                    +
+                  </button>
+
+                  <div id="menu" class="plus-menu hidden">
+                    <button class="menu-item" id="uploadPhotoBtn" type="button">
+                      <i class="bi bi-camera me-2"></i> Take a Photo
+                    </button>
+                    <button class="menu-item" id="uploadFileBtn" type="button">
+                      <i class="bi bi-upload me-2"></i> Upload File
+                    </button>
+                  </div>
+                </div>
+
+                <input
+                  id="chat"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g., tomato, cheese, basil"
+                />
+                <button id="voice" type="button" class="btn btn-primary">
+                  <i class="bi bi-mic-fill"></i>
+                </button>
+                <button id="ask" type="submit" class="btn btn-primary">
+                  <i class="bi bi-arrow-right lh-2"></i>
+                </button>
+                <button id="addchip" type="submit" class="btn btn-primary">
+                  <i class="bi bi-arrow-down lh-2"></i>
+                </button>
+              </div>
             </form>
+
+            <input type="file" id="imageInput" accept="image/*" hidden />
+            <input type="file" id="fileInput" hidden />
+            <div id="outputContainer"></div>
+            <div id="fileName" class="file-name"></div>
           </div>
         </div>
       </div>
