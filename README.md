@@ -31,5 +31,13 @@ RecipeGPT is an interactive web application that helps users generate recipes, m
 ```bash
 git clone https://github.com/Abdallah510/RecipeGPT.git or git clone https://github.com/Abdallah510/RecipeGPT
 cd RecipeGPT
+```
+### 2. Install Dependencies
+```bash
 npm install
+
+```
+### 3. Run the Web Server
+```bash
 node app.js
+```
