@@ -14,16 +14,14 @@ RecipeGPT is an interactive web application that helps users generate recipes, m
 | 🍱 Personalized Meal Planner | Generate structured meal plans based on goals and dietary preferences. |
 | 🍽️ AI Recipe Recommender | Get culturally diverse and creative meal ideas. |
 | 🤖 Chatbot Assistant | Ask cooking questions in real time. |
-| 🔊 Optional Voice Output | The AI can read the recipe steps out loud. |
 
 ---
 
 ## 🧠 Tech Stack
 
-- **Backend / AI**: Google Prompt API (Multimodal)
-- **Frontend**: HTML, CSS, JavaScript
-- **Server Runtime**: Node.js
-- **Optional Enhancements**: Bootstrap UI styling, Web Speech API
+- **Backend**: Node.js.
+- **Frontend / AI**: HTML, CSS, JavaScript, Google Prompt API (Multimodal).
+- **Optional Enhancements**: Bootstrap UI styling.
 
 ---
 
@@ -31,5 +29,7 @@ RecipeGPT is an interactive web application that helps users generate recipes, m
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/RecipeGPT.git
+git clone https://github.com/Abdallah510/RecipeGPT.git
 cd RecipeGPT
+npm install
+node app.js
