@@ -8,11 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("recommendBtn");
   const container = document.getElementById("recipesContainer");
 
-  btn.addEventListener("click", async (e) => {
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
+  document.getElementById("recipeForm").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
     btn.disabled = true;
     const initialMsg = document.querySelector(".initial-message");
     if (initialMsg) initialMsg.remove();

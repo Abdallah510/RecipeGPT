@@ -1,5 +1,6 @@
 // uiHandlers.js
-import { handleImageUpload } from "./imageHandler.js";
+import { handleImageUpload, setupCameraCapture, setupWebcamCapture } from "./imageHandler.js";
+
 
 export function setupUIHandlers() {
     const plusBtn = document.getElementById("plusBtn");
@@ -30,11 +31,19 @@ export function setupUIHandlers() {
         if (!menu.contains(e.target) && e.target !== plusBtn) menu.classList.add("hidden");
     });
 
-    uploadPhotoBtn.addEventListener("click", (e) => {
+    uploadPhotoBtn.addEventListener("click", async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        imageInput.click();
+
+        const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            await setupCameraCapture();  // opens phone camera
+        } else {
+            await setupWebcamCapture();  // opens laptop camera live
+        }
     });
+
 
     uploadFileBtn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -44,8 +53,12 @@ export function setupUIHandlers() {
 
     // File/image preview + handle AI upload
     imageInput.addEventListener("change", async () => {
-        if (imageInput.files.length > 0) {
-            await handleImageUpload(imageInput.files[0]);
+        const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            await setupCameraCapture();  // opens phone camera
+        } else {
+            await setupWebcamCapture();  // opens laptop camera live
         }
     });
 
