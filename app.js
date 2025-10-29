@@ -14,4 +14,7 @@ app.get("/", (req, res) => res.render("home"));
 app.get("/recommendations", (req, res) => res.render("recommendations"));
 app.get("/meal-planner", (req, res) => res.render("meal-planner"));
 
-app.listen(3000, () => console.log("Server running at http://localhost:3000"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+});
