@@ -1,15 +1,14 @@
 {
-  "name": "project",
+  "name": "recipegpt",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI-powered recipe and meal planner web app",
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
-  "type": "module",
   "license": "ISC",
   "dependencies": {
     "@google/genai": "^1.22.0",
