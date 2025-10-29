@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("generateBtn");
   const container = document.getElementById("mealResults");
 
-  // Use submit so Enter key works
   document.getElementById("mealForm").addEventListener("submit", async (ev) => {
     ev.preventDefault();
     btn.disabled = true;
