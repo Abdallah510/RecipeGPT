@@ -61,6 +61,7 @@ export function setupVoiceInput() {
             topK: params.defaultTopK,
             expectedOutputs: [{ type: "text", languages: ["en"] }]
         });
+        chatInput.value = "Processing audio...";
         const result = await session.prompt([
             {
                 role: "user",
