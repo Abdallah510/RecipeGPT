@@ -41,7 +41,7 @@ npm install
 ```bash
 node app.js
 ```
-### 3. Run the Chrome
+### 3. Run on Chrome
 ```bash
 http://localhost:3000
 ```
